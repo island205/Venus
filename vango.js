@@ -125,7 +125,7 @@
         if (container == null) {
             return;
         }
-        cvs = this.canvas = DOC.createElementByTagName("canvas");
+        cvs = this.canvas = DOC.createElement("canvas");
         cvs.width = width;
         cvs.height = height;
         this.context = cvs.getContext("2d");
@@ -138,14 +138,14 @@
     vangoprop.attr = function (key, value) {
         this.canvas.setAttribute(key, value);
     }
-    vangoprop.attr = __overloadGetterSetter.call(Vango.attr, function (key) {
-        this.canvas.getAttribute(key);
+    vangoprop.attr = __overloadGetterSetter.call(vangoprop.attr, function (key) {
+        return this.canvas.getAttribute(key);
     });
 
     vangoprop.css = function (property, value) {
         this.canvas.style[property] = value;
     };
-    vangoprop.css = __overloadGetterSetter.call(Vango.css, function (property) {
+    vangoprop.css = __overloadGetterSetter.call(vangoprop.css, function (property) {
         return this.canvas.style[property];
     });
 
@@ -190,7 +190,7 @@
         this.context[key] = value;
     };
 
-    vangoprop.style = __overloadGetterSetter.call(Vango.style, function (key) {
+    vangoprop.style = __overloadGetterSetter.call(vangoprop.style, function (key) {
         return this.context[key];
     });
 
