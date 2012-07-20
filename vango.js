@@ -83,8 +83,9 @@
 
     var __hasProp = Object.prototype.hasOwnProperty,
         DOC = document,
+        PI=Math.PI,
         vangoprop = Vango.prototype,
-        defaultoptions = {
+        defaultOptions = {
             fill: true,
             stroke: false
         },
@@ -314,7 +315,7 @@
         rectangle: function (x, y, width, height, options) {
             var ss;
             options = options || {};
-            options = __mergeOptions(options, defaultOptions);
+            options = __mergeOptions(defaultOptions, options);
             ss = options.styles;
             this.save();
             if (ss) {
@@ -585,7 +586,7 @@
 
     function __mergeOptions(dest, src) {
         for (var i in src) {
-            dest[i] = src;
+            dest[i] = src[i];
         }
         return dest;
     }

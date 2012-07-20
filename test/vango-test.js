@@ -63,3 +63,63 @@ test(":style",function(){
         "strokeStyle":this.vango.style("strokeStyle")
     });
 });
+
+test(":beginPath,closePath¡­¡­",function(){
+    this.vango.beginPath().arc(50, 50, 40, 0, 360).closePath().stroke().style("fillStyle", "red").fillRect(40, 40, 20, 20);
+    ok(true,"there is no error!");
+});
+
+test(":isPointInPath createImageData¡­¡­",function(){
+    this.vango.beginPath().arc(50, 50, 40, 0, 360).closePath();
+    equal(this.vango.isPointInPath(50, 50),this.vango.context.isPointInPath(50, 50));
+    ok(this.vango.isPointInPath(50, 50));
+});
+
+test(":extend .entend", 3, function(){
+    Vango.extend("ok",function(){
+        ok(true);
+    });
+    this.vango.ok();
+    this.vango.extend("equal",function(){
+        equal(true,true);
+    });
+    this.vango.equal();
+    delete Vango.prototype.ok;
+    try{
+        this.vango.ok();
+    }catch(e){
+        ok(true);
+    } 
+});
+
+test(":line",function(){
+    this.vango.line(0, 0, 100, 100);
+    ok(true);
+});
+
+test(":circle",function(){
+    this.vango.circle(50, 50, 40,{
+        fill:true,
+        styles:{
+            fillStyle:"red"
+        }
+    });
+    ok(true);
+});
+
+test(":rectangle",function(){
+    this.vango.rectangle(10, 10, 80, 80, {
+        fill:false,
+        stroke:true,
+        styles:{
+            strokeStyle:"blue",
+            lineWidth:"10"
+        }
+    });
+    ok(true);
+});
+
+test(":ellipse", function(){
+    this.vango.ellipse(50, 50, 40, 30);
+    ok(true);
+});
