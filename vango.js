@@ -99,17 +99,18 @@
             }, 1000 / 60);
         };
         animate = function (duration, callback) {
-            var finished, startTime, step;
+            var finished, startTime, step,
+              that=this;
             startTime = new Date();
             finished = -1;
             step = function (timestemp) {
                 var progress;
                 progress = timestemp - startTime;
                 if (progress >= duration) {
-                    callback(finished);
+                    callback.call(that,finished);
                     return;
                 }
-                callback(progress);
+                callback.call(that, progress);
                 return requestAnimationFrame(step);
             };
             return requestAnimationFrame(step);
@@ -513,6 +514,13 @@
             this.transform(ct, - st, st, ct, - x * ct - y * st + x,
             x * st - y * ct + y);
             return this;
+        },
+
+        /*
+         * clear canvas
+         */
+        clear: function(){
+            this.clearRect(0,0, this.attr("width",this.attr("height")));       
         }
     });
 
@@ -520,10 +528,30 @@
     /*
      * native events adapter
      */
-    Vango.extend({
-        on: function (type, listener) {},
-        off: function (type, listener) {}
-    });
+    (function(){
+        var W3C=!!window.addEventListener;
+        Vango.extend({
+            on: function (type, listener) {
+                var cvs=this.canvas; 
+                if (!W3C) {
+                    cvs['e'+type+listenner] = fn;
+                    cvs[type+listenner] = function(){cvs['e'+type+listenner]( window.event );}
+                    obj.attachEvent( 'on'+type, cvs[type+listenner] );
+                  } else
+                    cvs.addEventListener( type, listener, false );
+            },
+            off: function (type, listener) {
+                var cvs=this.canvas;
+                if ( !W3C ) {
+                    cvs.detachEvent( 'on'+type, cvs[type+listener] );
+                    cvs[type+listener] = null;
+                } else{
+                    cvs.removeEventListener( type,listener, false );
+                }
+            }
+        });
+    })();
+    
 
     /*
      * animate
@@ -563,7 +591,7 @@
     function __styleFillAndStroke(options, pathBuilder) {
         var ss;
         options = options || {};
-        options = __mergeOptions(options, defaultOptions);
+        options = __mergeOptions(defaultOptions, options);
         ss = options.styles;
 
         this.save();

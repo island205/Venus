@@ -179,6 +179,55 @@ test(":text", function(){
     ok(true);
 });
 
+test(":animate", function(){
+    var circles=[],
+    start=0,
+    end=0;
+    for(var i=0; i<100; i++){
+        circles.push({
+            x:Math.random()*590,
+            y:Math.random()*290
+        });
+    }
+    this.vango.attr({
+        width:600,
+        height:300
+    }).animate(Infinity, function(pro){
+        var that=this;
+        end=pro;
+        if((end-start)<100){
+            return;
+        }
+        start=end;
+        this.clear();
+        this.rectangle(0,0, 600,300, {
+            stoke:true,
+            styles:{
+                lineWidth:5,
+                fillStyle:"#eee",
+                strokeStyle:"#999"
+            }
+        });
+        circles.forEach(function(circle){
+            circle.x+=(Math.random()-0.5)*20;
+            circle.y+=(Math.random()-0.5)*20;
+            circle.x <0 ? circle.x = 0: "";
+            circle.x >600 ? circle.x = 600: "";
+            circle.y <0 ? circle.y = 0: "";
+            circle.y >300 ? circle.y =300: "";
+            that.circle(circle.x, circle.y, 10, {
+                stroke:true,
+                styles:{
+                    lineWidth:10,
+                    fillStyle:"yellow",
+                    strokeStyle:"silver"
+                }
+            });
+        });
+    });
+    ok(true);
+});
+
 
 
 
