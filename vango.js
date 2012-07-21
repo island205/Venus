@@ -368,12 +368,12 @@
             });
             return this;
         },
-        sector: function (x, y, radius, startAngle, endAngle, /*[*/ counterclockwise, options /*]*/ ) {
+        sector: function (x, y, radius, startAngle, endAngle, /*[*/ options, counterclockwise/*]*/ ) {
             var that = this;
             counterclockwise = counterclockwise || false;
             __styleFillAndStroke.call(this, options, function () {
                 that.beginPath();
-                that.arc(x, y, radius, startAngle, endAngle, anticlockwise);
+                that.arc(x, y, radius, startAngle, endAngle, counterclockwise);
                 that.lineTo(x, y);
                 that.closePath();
             });
@@ -463,6 +463,7 @@
          */
         image: function (image, coordinateDimensioning, /*[*/ callback /*]*/ ) {
             var that = this;
+            coordinateDimensioning = coordinateDimensioning || [];
             if (typeof image === "string") {
                 __loadImage(image, drawImage);
             } else {
@@ -471,7 +472,7 @@
 
             function drawImage(image) {
                 coordinateDimensioning.unshift(image);
-                that.drawImage.apply(that, args);
+                that.drawImage.apply(that, coordinateDimensioning);
                 callback && callback.call(null, coordinateDimensioning);
             }
             return this;
@@ -490,8 +491,8 @@
                 this.style(ss);
             }
             maxWidth = options.maxWidth;
-            options.fill && this.fillText(text, x, y, width, height, maxWdith);
-            options.stroke && this.strokeText(text, x, y, width, height, maxWidth);
+            options.fill && this.fillText(text, x, y, maxWidth);
+            options.stroke && this.strokeText(text, x, y, maxWidth);
             this.restore();
             return this;
         },
@@ -576,19 +577,23 @@
     }
 
     function __loadImage(image, callback) {
-        var imageEle = DOC.createElememnt(img);
+        var imageEle = DOC.createElement("image");
         imageEle.onload = function () {
             callback(imageEle);
             delete imageEle;
         }
-        image.src = image;
+        imageEle.src = image;
     }
 
     function __mergeOptions(dest, src) {
-        for (var i in src) {
-            dest[i] = src[i];
+        var options={};
+        for (var i in dest) {
+            options[i] = dest[i];
         }
-        return dest;
+        for(i in src){
+            options[i]=src[i];
+        }
+        return options;
     }
 
     /**
@@ -597,7 +602,7 @@
      *  L data for the purpose of high performance Path
      *  rendering
      */
-    function _getDataArray() {
+    function _getDataArray(pathString) {
 
         // Path Data Segment must begin with a moveTo
         //m (x y)+  Relative moveTo (subsequent points are treated as lineTo)
@@ -622,10 +627,10 @@
         //A (rx ry x-axis-rotation large-arc-flag sweep-flag x y)+  Absolute Elliptical Arc
 
         // command string
-        var cs = this.attrs.data;
+        var cs = pathString;
 
         // return early if data is not defined
-        if (!this.attrs.data) {
+        if (!cs) {
             return [];
         }
         // command chars

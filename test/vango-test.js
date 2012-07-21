@@ -1,3 +1,5 @@
+var PI=Math.PI;
+
 test("Vango",function(){
    ok(true,"no error"); 
 });
@@ -120,6 +122,64 @@ test(":rectangle",function(){
 });
 
 test(":ellipse", function(){
-    this.vango.ellipse(50, 50, 40, 30);
+    this.vango.ellipse(50, 50, 30, 20);
     ok(true);
 });
+
+test(":polygon", function(){
+    this.vango.polygon(50, 50, 6, 40, 75, false);
+    ok(true);
+});
+
+test(":sector", function(){
+    this.vango.sector(50, 50, 40, PI/2, PI, {
+        styles:{
+            "fillStyle":"green"
+        }
+    });
+    ok(true);
+});
+
+test(":path", function(){
+    var vango=new Vango(document.body, tiger[2], tiger[3]).translate(200, 200);
+    
+    tiger.forEach(function(path){
+        if(typeof path === "object"){
+            vango.path(path.path, {
+                styles:{
+                    lineWidth:path["stroke-width"],
+                    strokeStyle:path.stroke,
+                    fillStyle:path.fill
+                }
+            })
+        }
+    }); 
+    ok(true);
+});
+
+//TODO
+test(":image", function(){
+    this.vango.attr({
+        width:300,
+        height:300
+    });
+    this.vango.image("http://img3.douban.com/view/photo/photo/public/p795728306.jpg",[0, 0,300, 300]);
+    ok(true);
+});
+
+test(":text", function(){
+    this.vango.text(20, 20, "Hello World", {
+        styles:{
+            fillStyle:"red"
+        }
+    }).text(40, 40, "!", {
+        fill:false,
+        stroke:true
+    });
+    ok(true);
+});
+
+
+
+
+
