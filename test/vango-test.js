@@ -179,6 +179,16 @@ test(":text", function(){
     ok(true);
 });
 
+test(":event", function(){
+    stop();
+    this.vango.text(50, 50, "click me!").on("click",function(event){
+        console.log(event);
+        ok(true);
+        this.fillRect(0, 0, 30, 30);
+        this.off("click",arguments.callee);
+        start();
+    });
+});
 test(":animate", function(){
     var circles=[],
     start=0,
@@ -200,7 +210,7 @@ test(":animate", function(){
         }
         start=end;
         this.clear();
-        this.rectangle(0,0, 600,300, {
+        this.rectangle(5,5, 595,295, {
             stoke:true,
             styles:{
                 lineWidth:5,

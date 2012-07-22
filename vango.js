@@ -83,7 +83,8 @@
 
     var __hasProp = Object.prototype.hasOwnProperty,
         DOC = document,
-        PI=Math.PI,
+        PI = Math.PI,
+        guid = 0,
         vangoprop = Vango.prototype,
         defaultOptions = {
             fill: true,
@@ -100,14 +101,14 @@
         };
         animate = function (duration, callback) {
             var finished, startTime, step,
-              that=this;
+            that = this;
             startTime = new Date();
             finished = -1;
             step = function (timestemp) {
                 var progress;
                 progress = timestemp - startTime;
                 if (progress >= duration) {
-                    callback.call(that,finished);
+                    callback.call(that, finished);
                     return;
                 }
                 callback.call(that, progress);
@@ -204,32 +205,25 @@
     [
     /*
      * path method
-     */
-    "beginPath", "closePath", "fill", "stroke", "clip", "moveTo", "lineTo", "arc", "arcTo", "bezierCurveTo", "quadraticCurveTo", "rect",
+     */"beginPath", "closePath", "fill", "stroke", "clip", "moveTo", "lineTo", "arc", "arcTo", "bezierCurveTo", "quadraticCurveTo", "rect",
     /*
      * rectangles
-     */
-    "clearRect", "fillRect", "strokeRect",
+     */"clearRect", "fillRect", "strokeRect",
     /*
      * text
-     */
-    "fillText", "strokeText",
+     */"fillText", "strokeText",
     /*
      * image drawing
-     */
-    "drawImage",
+     */"drawImage",
     /*
      * pixel manipulation
-     */
-    "putImageData",
+     */"putImageData",
     /*
      * 2D Context
-     */
-    "save", "restore",
+     */"save", "restore",
     /*
      * transform
-     */
-    "scale", "rotate", "translate", "transform", "setTransform"].forEach(function (method) {
+     */"scale", "rotate", "translate", "transform", "setTransform"].forEach(function (method) {
         vangoprop[method] = function () {
             var ctx = this.context;
             ctx[method].apply(ctx, arguments);
@@ -240,18 +234,15 @@
 
     /*
      * return original returns
-     */
-    [
+     */ [
     /*
      * path
-     */
-    "isPointInPath",
+     */"isPointInPath",
     /*
      * text
      * measureText Interface
      * width	{float}	readonly
-     */
-    "measureText",
+     */"measureText",
     /*
      * pixel manipulation
      * imageData	interface
@@ -260,14 +251,12 @@
      * 	data	CanvasPixelArray	readyonly
      * CanvasPixelArray interface
      * 	length	unsigned	readyonly
-     */
-    "createImageData", "getImageData",
+     */"createImageData", "getImageData",
     /*
      * color style & shadow
      * CanvasGradient interface
      * 	void	addColorStop(float offset,string color)
-     */
-    "createLinearGradient", "createRadialGradient", "createPattern"].forEach(function (method) {
+     */"createLinearGradient", "createRadialGradient", "createPattern"].forEach(function (method) {
         vangoprop[method] = function () {
             var ctx = this.context;
             return ctx[method].apply(ctx, arguments);
@@ -369,7 +358,7 @@
             });
             return this;
         },
-        sector: function (x, y, radius, startAngle, endAngle, /*[*/ options, counterclockwise/*]*/ ) {
+        sector: function (x, y, radius, startAngle, endAngle, /*[*/ options, counterclockwise /*]*/ ) {
             var that = this;
             counterclockwise = counterclockwise || false;
             __styleFillAndStroke.call(this, options, function () {
@@ -519,39 +508,49 @@
         /*
          * clear canvas
          */
-        clear: function(){
-            this.clearRect(0,0, this.attr("width",this.attr("height")));       
+        clear: function () {
+            this.clearRect(0, 0, this.attr("width", this.attr("height")));
         }
     });
 
 
     /*
      * native events adapter
-     */
-    (function(){
-        var W3C=!!window.addEventListener;
+     */ (function () {
+        var W3C = !! window.addEventListener;
         Vango.extend({
             on: function (type, listener) {
-                var cvs=this.canvas; 
+
+                var cvs = this.canvas,
+                    that = this,
+                    _listener;
+                this.listeners = this.listeners || {};
                 if (!W3C) {
-                    cvs['e'+type+listenner] = fn;
-                    cvs[type+listenner] = function(){cvs['e'+type+listenner]( window.event );}
-                    obj.attachEvent( 'on'+type, cvs[type+listenner] );
-                  } else
-                    cvs.addEventListener( type, listener, false );
+                    _listener = this.listeners[type + listener] = function () {
+                        listener.call(that, window.event);
+                    };
+                    cvs.attachEvent("on" + type, _listener);
+                } else {
+                    _listener = this.listeners[type + listener] = function () {
+                        listener.apply(that, arguments);
+                    }
+                    cvs.addEventListener(type, _listener, false);
+                }
             },
             off: function (type, listener) {
-                var cvs=this.canvas;
-                if ( !W3C ) {
-                    cvs.detachEvent( 'on'+type, cvs[type+listener] );
-                    cvs[type+listener] = null;
-                } else{
-                    cvs.removeEventListener( type,listener, false );
+                var cvs = this.canvas,
+                    _listener;
+                this.listeners = this.listeners || {};
+                _listener = this.listeners[type + listener];
+                if (!W3C) {
+                    cvs.detachEvent('on' + type, _listener);
+                } else {
+                    cvs.removeEventListener(type, _listener, false);
                 }
             }
         });
     })();
-    
+
 
     /*
      * animate
@@ -614,12 +613,12 @@
     }
 
     function __mergeOptions(dest, src) {
-        var options={};
+        var options = {};
         for (var i in dest) {
             options[i] = dest[i];
         }
-        for(i in src){
-            options[i]=src[i];
+        for (i in src) {
+            options[i] = src[i];
         }
         return options;
     }
@@ -904,14 +903,14 @@
         var cy = (y1 + y2) / 2.0 + Math.sin(psi) * cxp + Math.cos(psi) * cyp;
 
         var vMag = function (v) {
-                return Math.sqrt(v[0] * v[0] + v[1] * v[1]);
-            }
+            return Math.sqrt(v[0] * v[0] + v[1] * v[1]);
+        }
         var vRatio = function (u, v) {
-                return (u[0] * v[0] + u[1] * v[1]) / (vMag(u) * vMag(v))
-            }
+            return (u[0] * v[0] + u[1] * v[1]) / (vMag(u) * vMag(v))
+        }
         var vAngle = function (u, v) {
-                return (u[0] * v[1] < u[1] * v[0] ? -1 : 1) * Math.acos(vRatio(u, v));
-            }
+            return (u[0] * v[1] < u[1] * v[0] ? -1 : 1) * Math.acos(vRatio(u, v));
+        }
         var theta = vAngle([1, 0], [(xp - cxp) / rx, (yp - cyp) / ry]);
 
         var u = [(xp - cxp) / rx, (yp - cyp) / ry];
@@ -925,6 +924,15 @@
         if (fs == 1 && dTheta < 0) dTheta = dTheta + 2 * Math.PI;
 
         return [cx, cy, rx, ry, theta, dTheta, psi, fs];
+    }
+
+    function __generateGuid(prefix) {
+        guid++;
+        if (prefix) {
+            return prefix + guid;
+        } else {
+            return "vango" + guid;
+        }
     }
     return Vango;
 });
